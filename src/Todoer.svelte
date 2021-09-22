@@ -1,41 +1,36 @@
 <script>
 
-    import {token} from "./store";
+    import {token, userLogin} from "./store";
     import {onMount} from "svelte";
+    import TaskCreator from "./TaskCreator.svelte";
 
     let tasks = [];
-    let newTaskData = {
-        title: null,
-        description: null
-    }
 
-    async function create() {
-        console.log(JSON.stringify(newTaskData))
+    async function create(newTaskData) {
         try {
+            console.log(newTaskData)
             const req = await fetch(
                 `http://127.0.0.1:1337/createTask`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${$token}`
+                        'Authorization': `Bearer ${$token}`,
+                        'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(newTaskData)
+                    body: JSON.stringify(newTaskData.detail)
                 }
             )
 
-            const res = await req.json()
-            console.log(res)
-            if(req.status === 201) {
-                console.log(res)
-            }   else {
+            if (req.status === 201) {
+                await getTasks()
+            } else {
 
             }
-        }   catch (e) {
+        } catch (e) {
             console.log(e)
         }
     }
 
     async function getTasks() {
-
         try {
             const req = await fetch(
                 `http://127.0.0.1:1337/getMyTasks`, {
@@ -48,8 +43,6 @@
             if (req.status === 200) {
                 tasks = await req.json()
             }
-
-
         } catch (e) {
             console.log(e)
         }
@@ -61,32 +54,71 @@
 
 </script>
 
-<h2>TODOer</h2>
+<div class="container">
+    <h2>Привет, {$userLogin}!</h2>
 
-<div>
-    <input type="text" bind:value={newTaskData.title} placeholder="Название">
-    <input type="text" bind:value={newTaskData.description} placeholder="Описание">
-    <button on:click={create}>Создать</button>
+    <TaskCreator on:create={create}/>
+
+    {#if tasks.length !== 0}
+        <h3>Ваши задачи</h3>
+        <div class="tasks">
+            {#each tasks as task (task.id)}
+                <div class="task">
+                    <h4>{task['task.title']}</h4>
+                    <p>{task['task.description']}</p>
+                </div>
+            {/each}
+        </div>
+    {:else}
+        <p>Список задач пуст</p>
+    {/if}
 </div>
 
-{#if tasks.length !== 0}
-    {#each tasks as task (task.id)}
-        <div class="task">
-            <p>{task.title}</p>
-
-        </div>
-    {/each}
-{:else}
-    <p>Список задач пуст</p>
-{/if}
-
 <style>
-    .task {
-        display: flex;
-        align-items: center;
+    .container {
+        max-width: 1700px;
+        margin: 50px auto;
     }
 
-    .task button {
-        margin-left: 20px;
+    h2, h3 {
+        margin-bottom: 25px;
+    }
+
+
+    .task {
+        padding: 10px;
+        border: 1px solid rgba(0, 0, 0, .1);
+        border-radius: 10px;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, .15);
+    }
+
+    .tasks {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 15px;
+    }
+
+    @media screen and (max-width: 1500px) {
+        .tasks {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+
+    @media screen and (max-width: 1200px) {
+        .tasks {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media screen and (max-width: 800px) {
+        .tasks {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media screen and (max-width: 550px) {
+        .tasks {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
