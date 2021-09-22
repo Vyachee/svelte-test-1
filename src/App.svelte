@@ -1,27 +1,31 @@
 <script>
-	import {Router, Route, Link} from 'svelte-navigator';
-	import Todoer from "./Todoer.svelte";
+    import Todoer from "./Todoer.svelte";
+    import {token} from "./store";
+    import Auth from "./Auth.svelte";
 </script>
 
 <svelte:head>
-	<title>My test projects!</title>
+    <title>My test projects!</title>
+    <style>
+        *, body, html {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+    </style>
 </svelte:head>
 
-<Router>
-	<header>
-		<h1>Некоторое дерьмо</h1>
-		<nav>
-			<Link to="/">About</Link>
-			<Link to="todo">TODOer</Link>
-		</nav>
-	</header>
+<main>
+    {#if $token == null }
+        <Auth/>
+    {:else}
+        <Todoer/>
+    {/if}
+</main>
 
-	<main>
-		<Route path="/">
-			<h2>Hello yeah</h2>
-		</Route>
-
-		<Route path="todo" component="{Todoer}"/>
-	</main>
-
-</Router>
+<style>
+    main {
+        padding: 10px;
+        box-sizing: border-box;
+    }
+</style>
