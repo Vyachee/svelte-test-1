@@ -48,14 +48,42 @@
         }
     }
 
+    function logout() {
+        token.set(null)
+        userLogin.set(null)
+    }
+
     onMount(async () => {
         await getTasks()
     })
 
+    async function deleteTask(id) {
+        try {
+            const req = await fetch(
+                `http://127.0.0.1:1337/deleteTask`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${$token}`
+                    },
+                    body: JSON.stringify({task_id: id}),
+                }
+            )
+
+            if (req.status === 200) {
+                await getTasks()
+            }
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
 </script>
 
 <div class="container">
-    <h2>Привет, {$userLogin}!</h2>
+    <div class="inline">
+        <h2>Привет, {$userLogin}!</h2> <span on:click={logout}>(выйти)</span>
+    </div>
 
     <TaskCreator on:create={create}/>
 
@@ -66,6 +94,7 @@
                 <div class="task">
                     <h4>{task['task.title']}</h4>
                     <p>{task['task.description']}</p>
+                    <span class="delete" on:click={() => deleteTask(task.id)}>Удалить</span>
                 </div>
             {/each}
         </div>
@@ -96,6 +125,24 @@
         display: grid;
         grid-template-columns: repeat(5, 1fr);
         gap: 15px;
+    }
+
+    .inline {
+        margin-bottom: 10px;
+    }
+
+    .inline * {
+        display: inline;
+    }
+
+    span {
+        cursor: pointer;
+        color: #900;
+        font-size: 12px;
+    }
+
+    span:hover {
+        text-decoration: underline;
     }
 
     @media screen and (max-width: 1500px) {

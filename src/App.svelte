@@ -24,7 +24,7 @@
 </svelte:head>
 
 <main>
-    {#if $token == null }
+    {#if $token === 'null' || $token === null }
         <Auth/>
     {:else}
         <Todoer/>

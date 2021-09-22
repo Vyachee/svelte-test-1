@@ -1,4 +1,7 @@
 import {writable} from "svelte/store";
 
-export const token = writable()
-export const userLogin = writable(null)
+const storedToken = localStorage.getItem('token')
+const storedUserLogin = localStorage.getItem('userLogin')
+
+export const token = writable(storedToken)
+export const userLogin = writable(storedUserLogin)

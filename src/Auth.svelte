@@ -2,6 +2,15 @@
 
     import {token, userLogin} from "./store";
 
+    token.subscribe(value => {
+        localStorage.setItem('token', value)
+    })
+
+    userLogin.subscribe(value => {
+        console.log(value)
+        localStorage.setItem('userLogin', value)
+    })
+
     let isAuth = true
 
     let authData = {
